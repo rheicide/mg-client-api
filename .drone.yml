@@ -14,7 +14,7 @@ pipeline:
     user: nphung
     key: ${SSH_KEY}
     target: /opt/mg-client-api
-    include: [ "docker-compose.yaml" ]
+    include: [ "docker-compose.yml" ]
     exclude: [ "*" ]
     script:
       - cd /opt/mg-client-api

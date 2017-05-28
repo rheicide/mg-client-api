@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  mg-hook:
+  mg-client-api:
     image: nphung/mg-client-api
     ports:
       - 3000
