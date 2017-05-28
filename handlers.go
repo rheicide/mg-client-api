@@ -17,6 +17,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	r "gopkg.in/gorethink/gorethink.v3"
+	"os"
 )
 
 type HttpError struct {
@@ -32,10 +33,21 @@ func (e HttpError) Error() string {
 type Handler func(http.ResponseWriter, *http.Request) error
 
 var (
+	session      *r.Session
 	rsaPublicKey *rsa.PublicKey
 )
 
 func init() {
+	var err error
+
+	session, err = r.Connect(r.ConnectOpts{
+		Address:  os.Getenv("R_ADDR"),
+		Database: "mailgun",
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	publicKey := `
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvXCk70W1gEOz699tXYv/NkKjiT9FV97o+pj+gNWzBpaoyv4S3QNC+I8pW0sVu5qNygtDJ72x1aDA
@@ -43,8 +55,6 @@ gWrOMYNg1OC8JiYvQLdEYcYpTy9m8RObM+Cpz/iHVGnEdPS8jxqJ27kTIBG1joQ2HyVbYDZfWUHIK1ks
 Khcz8gGvCtDtdsvlDuEwfOgugGujHFpATlhLvfzhzbV5MznUhX89p+Lzf7j+XqWaoDaLScUgvzAo6vBs3pXfswWTMxYqv3SFkFqEmDLQNfx724n04GP1BMYU
 rccXtUlC/6GN0b4Rro4ncAiArQIDAQAB
 -----END PUBLIC KEY-----`
-
-	var err error
 	rsaPublicKey, err = jwt.ParseRSAPublicKeyFromPEM([]byte(publicKey))
 	if err != nil {
 		log.Fatalln(err)
