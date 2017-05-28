@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  mg-hook:
+    image: nphung/mg-client-api
+    ports:
+      - 3000
+    environment:
+      - R_ADDR=rethinkdb:28015
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=Host:mg-client-api.elarvee.xyz"
+
+networks:
+  web:
+    external:
+      name: traefik_webgateway

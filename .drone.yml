@@ -1,0 +1,22 @@
+pipeline:
+  docker:
+    image: plugins/docker
+    username: ${DOCKER_USERNAME}
+    password: ${DOCKER_PASSWORD}
+    repo: nphung/mg-client-api
+    tags:
+      - latest
+      - 1.0
+
+  deploy:
+    image: drillster/drone-rsync
+    hosts: [ "gcp-sea.elarvee.xyz" ]
+    user: nphung
+    key: ${SSH_KEY}
+    target: /opt/mg-client-api
+    include: [ "docker-compose.yaml" ]
+    exclude: [ "*" ]
+    script:
+      - cd /opt/mg-client-api
+      - docker-compose pull
+      - docker-compose up -d --force-recreate
