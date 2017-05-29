@@ -24,6 +24,7 @@ func NewRouter() http.Handler {
 		http.MethodGet,
 		http.MethodPost,
 		http.MethodOptions,
+		http.MethodDelete,
 	})
 	allowedHeaders := handlers.AllowedHeaders([]string{
 		"Authorization",

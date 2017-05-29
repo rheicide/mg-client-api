@@ -17,6 +17,11 @@ var routes = Routes{
 	Route{
 		[]string{"GET"},
 		"/mails/{id}",
-		MailById,
+		GetMailById,
+	},
+	Route{
+		[]string{"DELETE"},
+		"/mails/{id}",
+		DeleteMailById,
 	},
 }

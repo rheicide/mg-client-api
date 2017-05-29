@@ -126,7 +126,7 @@ func MailIndex(w http.ResponseWriter, _ *http.Request) error {
 	return nil
 }
 
-func MailById(w http.ResponseWriter, req *http.Request) error {
+func GetMailById(w http.ResponseWriter, req *http.Request) error {
 	id := mux.Vars(req)["id"]
 	res, err := r.Table("mails").Get(id).Run(session)
 	if err != nil {
@@ -141,6 +141,18 @@ func MailById(w http.ResponseWriter, req *http.Request) error {
 	if err = json.NewEncoder(w).Encode(&mail); err != nil {
 		return HttpError{err, http.StatusInternalServerError}
 	}
+
+	return nil
+}
+
+func DeleteMailById(w http.ResponseWriter, req *http.Request) error {
+	id := mux.Vars(req)["id"]
+	_, err := r.Table("mails").Get(id).Delete().RunWrite(session)
+	if err != nil {
+		return HttpError{err, http.StatusInternalServerError}
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
