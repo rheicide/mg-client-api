@@ -123,8 +123,8 @@ func MailIndex(w http.ResponseWriter, req *http.Request) error {
 	res, err := r.Table("mails").
 		Pluck("id", "from", "subject", "date", "read", "starred").
 		OrderBy(r.Desc("date")).
-		Limit(limit).
 		Skip(offset).
+		Limit(limit).
 		Run(session)
 	if err != nil {
 		return HttpError{err, http.StatusInternalServerError}
