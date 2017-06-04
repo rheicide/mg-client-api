@@ -24,4 +24,9 @@ var routes = Routes{
 		"/mails/{id}",
 		DeleteMailById,
 	},
+	Route{
+		[]string{"PATCH"},
+		"/mails/{id}",
+		UpdateMailById,
+	},
 }

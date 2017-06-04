@@ -14,10 +14,13 @@ import (
 
 	"crypto/rsa"
 
+	"os"
+
+	"strconv"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	r "gopkg.in/gorethink/gorethink.v3"
-	"os"
 )
 
 type HttpError struct {
@@ -104,11 +107,24 @@ func validateToken(r *http.Request) error {
 	return err
 }
 
-func MailIndex(w http.ResponseWriter, _ *http.Request) error {
+func MailIndex(w http.ResponseWriter, req *http.Request) error {
+	queryValues := req.URL.Query()
+
+	limit, err := strconv.Atoi(queryValues.Get("limit"))
+	if err != nil || limit > 100 {
+		limit = 10
+	}
+
+	offset, err := strconv.Atoi(queryValues.Get("offset"))
+	if err != nil || offset > 100 {
+		offset = 0
+	}
+
 	res, err := r.Table("mails").
-		Pluck("id", "from", "subject", "date").
+		Pluck("id", "from", "subject", "date", "read", "starred").
 		OrderBy(r.Desc("date")).
-		Limit(10).
+		Limit(limit).
+		Skip(offset).
 		Run(session)
 	if err != nil {
 		return HttpError{err, http.StatusInternalServerError}
@@ -148,6 +164,28 @@ func GetMailById(w http.ResponseWriter, req *http.Request) error {
 func DeleteMailById(w http.ResponseWriter, req *http.Request) error {
 	id := mux.Vars(req)["id"]
 	_, err := r.Table("mails").Get(id).Delete().RunWrite(session)
+	if err != nil {
+		return HttpError{err, http.StatusInternalServerError}
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+	return nil
+}
+
+func UpdateMailById(w http.ResponseWriter, req *http.Request) error {
+	id := mux.Vars(req)["id"]
+
+	var body map[string]interface{}
+	err := json.NewDecoder(req.Body).Decode(&body)
+	if err != nil {
+		return HttpError{err, http.StatusBadRequest}
+	}
+
+	_, err = r.Table("mails").Get(id).Update(map[string]interface{}{
+		"read":    body["read"],
+		"starred": body["starred"],
+	}).RunWrite(session)
 	if err != nil {
 		return HttpError{err, http.StatusInternalServerError}
 	}

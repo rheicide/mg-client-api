@@ -15,6 +15,8 @@ type Mail struct {
 	BodyPlain string    `json:"body_plain,omitempty" gorethink:"body-plain"`
 	BodyHtml  string    `json:"body_html,omitempty" gorethink:"body-html"`
 	Date      time.Time `json:"date"`
+	Read      bool      `json:"read"`
+	Starred   bool      `json:"starred"`
 }
 
 // custom marshaller to convert date into my timezone
