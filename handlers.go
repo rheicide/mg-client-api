@@ -116,7 +116,7 @@ func MailIndex(w http.ResponseWriter, req *http.Request) error {
 	}
 
 	offset, err := strconv.Atoi(queryValues.Get("offset"))
-	if err != nil || offset > 100 {
+	if err != nil {
 		offset = 0
 	}
 
